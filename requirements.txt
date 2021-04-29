@@ -1,0 +1,6 @@
+requests==2.25.1
+beautifulsoup4==4.9.3
+logging2==0.1.2
+lxml==4.6.3
+pandas==1.2.4
+DateTime==4.3
