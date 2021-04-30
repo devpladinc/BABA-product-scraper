@@ -41,8 +41,8 @@ class AlibabaProductScraper():
 
     def get_data(self):
 
-        content, soup, ct = self.parse_url('https://www.alibaba.com/catalog/paintings_cid')
-        product_list, prod_name_l, prod_price_l, prod_rating_l, prod_rcount_l, prod_asin_l = [], [], [], [], [], []
+        content, soup, ct = self.parse_url('https://www.alibaba.com/catalog/vegetables_cid')
+        product_list, prod_name_l, prod_price_l, prod_minorder_l, prod_suppliers_l, prod_asin_l = [], [], [], [], [], []
 
         try:
             # dissect soup
@@ -56,39 +56,22 @@ class AlibabaProductScraper():
                                     
                 product_names = self.extract_text_vtags(soup_src, 'h4', prod_name_l)
                 product_prices = self.extract_text_vattributes(soup_src, {"data-e2e-name":"price@@normal"}, prod_price_l)
-
-            log.info('Product Names: %s', product_names)
-            log.info('Product Prices: %s', product_prices)
-
-            '''
-            for p in product_list:
-                p_name = p['Item Name']
-                p_price = p['Price']
-                p_rating = p['Rating']
-                p_rcount = p['Review Count']
-                p_asin = p['ASIN']
-
-                prod_name_l.append(p_name)
-                prod_price_l.append(p_price)
-                prod_rating_l.append(p_rating)
-                prod_rcount_l.append(p_rcount)
-                prod_asin_l.append(p_asin)
+                product_min_orders = self.extract_text_vattributes(soup_src, {"data-e2e-name":"minOrder"}, prod_minorder_l)
+                product_suppliers = self.extract_text_vattributes(soup_src, {"flasher-type":"supplierName"}, prod_suppliers_l)
 
             #generating CSV
-            product_dict = {'Item Name': prod_name_l,
-                            'Price': prod_price_l,
-                            'Rating': prod_rating_l,
-                            'Review Count': prod_rcount_l,
-                            'ASIN' : prod_asin_l
-                            }
+            product_dict = {'Item Name': product_names,
+                            'Price': product_prices,
+                            'Minimum Order': product_min_orders,
+                            'Supplier': product_suppliers
+                        }
 
+            log.info('Product List: %s', product_dict)
             df = pd.DataFrame(product_dict) 
         
             # saving the dataframe 
             df.to_csv('sample_product_{}-{}.csv'.format(str(date.today()),str(random.randrange(0,99999))))
-            print("Done saving csv")
-
-            '''
+            log.info('Data saved to file.')
 
         except Exception as e:
             print("Soup error:", str(e))
