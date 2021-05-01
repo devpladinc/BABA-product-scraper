@@ -1,2 +1,0 @@
-2021-04-29 18:01:10,765 DEBUG    Starting new HTTPS connection (1): www.alibaba.com:443
-2021-04-29 18:01:11,493 DEBUG    https://www.alibaba.com:443 "GET /catalog/baby-food_cid HTTP/1.1" 200 93928
