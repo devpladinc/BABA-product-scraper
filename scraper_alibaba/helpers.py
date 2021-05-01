@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import json
 import os
 import random
+import re
 from constant_store import uastrings as uas
 from utils import logging as log
 from datetime import date, time, timedelta
@@ -62,21 +63,28 @@ class AlibabaProductScraper():
 
             #generating dict to csv output
             product_dict = {'Item Name': product_names,
-                            'Price': product_prices,
+                            'Price Range': product_prices,
                             'Minimum Order': product_min_orders,
                             'Supplier': product_suppliers
                         }
 
             log.info('Product List: %s', product_dict)
-            df = pd.DataFrame(product_dict) 
-        
-            # saving the dataframe
-            file_name = 'outputs/sample_product_{}-{}.csv'.format(str(date.today()),str(random.randrange(0,99999)))
-            df.to_csv(file_name)
+            
+            try:
+                df = pd.DataFrame(product_dict) 
+            
+                # saving the dataframe to csv
+                file_name = 'outputs/extract_file_{}-{}.csv'.format(str(date.today()), str(random.randrange(0,999999)))
+                df.to_csv(file_name)
+            except Exception as e:
+                log.warning('Generating csv report error: %s', e)
+                # save to db
+                return False
 
         except Exception as e:
             log.warning('Generating data error: %s', e)
             return False
+
 
     def extract_text_vtags(self, soup, tag, prod_list):
         ''' iterator for each tag. extract tag and text 
@@ -87,6 +95,8 @@ class AlibabaProductScraper():
 
         for item in soup.find(tag):
             item_extract = item.text
+            if item_extract == None or item_extract == '':
+                item_extract = 'N/A'
             prod_list.append(item_extract)
         return prod_list
 
@@ -100,5 +110,7 @@ class AlibabaProductScraper():
             
         for item in soup.find_all(attrs=attrib):
             item_extract = item.text
+            if item_extract == None or item_extract == '':
+                item_extract = 'N/A'
             prod_list.append(item_extract)
         return prod_list    
